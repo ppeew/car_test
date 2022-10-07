@@ -41,7 +41,7 @@ func main() {
 				var ls []light
 				r := rand.Int63n(d.Raw("SELECT * FROM lights").Scan(&ls).RowsAffected)
 				l := ls[r]
-				fmt.Printf("Question%v: %v\n请输入您的答案(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):", i+1, l.Question)
+				fmt.Printf("\033[1;31;40mQuestion%v: %v\033[0m\n\033[1;33;43m(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):\033[0m", i+1, l.Question)
 				var ans int
 				fmt.Scanln(&ans)
 				if tran[ans] == l.Answer {
@@ -51,7 +51,7 @@ func main() {
 					fmt.Printf("回答错误，正确答案是:%v\n", l.Answer)
 				}
 			}
-			fmt.Printf("考试结束，你的成绩为:%v分\n", score)
+			fmt.Printf("\033[1;31;40m考试结束，你的成绩为:%v分\033[0m\n", score)
 		case "2":
 			f, _ := os.OpenFile("light.txt", os.O_RDONLY, 0666)
 			s := bufio.NewScanner(f)
