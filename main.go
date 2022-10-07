@@ -36,12 +36,18 @@ func main() {
 		case "1":
 			score := 0
 			tran := [4]string{"近光灯", "远光灯", "远近交替", "示宽灯"}
-
+			used_que := make(map[int64]bool, 0)
 			for i := 0; i < COUNT; i++ {
 				var ls []light
-				r := rand.Int63n(d.Raw("SELECT * FROM lights").Scan(&ls).RowsAffected)
+				total := d.Raw("SELECT * FROM lights").Scan(&ls).RowsAffected
+				r := rand.Int63n(total)
+				for used_que[r] {
+					//使用过了
+					r = (r*143 + 21) % total
+				}
+				used_que[r] = true
 				l := ls[r]
-				fmt.Printf("\033[1;31;40mQuestion%v: %v\033[0m\n\033[1;33;43m(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):\033[0m\n", i+1, l.Question)
+				fmt.Printf("\033[1;31;40mQuestion%v: %v\033[0m\n\033[1;35;48m(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):\033[0m", i+1, l.Question)
 				//启动定时器
 
 				var ans int
