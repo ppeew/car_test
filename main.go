@@ -18,7 +18,7 @@ type light struct {
 	Answer   string `gotm:"not null"`
 }
 
-var COUNT int = 10
+var COUNT int = 10 //题目数量
 
 func main() {
 	rand.Seed(time.Now().Unix())
@@ -41,7 +41,9 @@ func main() {
 				var ls []light
 				r := rand.Int63n(d.Raw("SELECT * FROM lights").Scan(&ls).RowsAffected)
 				l := ls[r]
-				fmt.Printf("\033[1;31;40mQuestion%v: %v\033[0m\n\033[1;33;43m(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):\033[0m", i+1, l.Question)
+				fmt.Printf("\033[1;31;40mQuestion%v: %v\033[0m\n\033[1;33;43m(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):\033[0m\n", i+1, l.Question)
+				//启动定时器
+
 				var ans int
 				fmt.Scanln(&ans)
 				if tran[ans] == l.Answer {
