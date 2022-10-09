@@ -38,7 +38,7 @@ func RunTest() {
 			mx.Lock()
 			if len(TIMEOUT) == 0 {
 				TIMEOUT <- "timeout"
-				fmt.Println("timeout++")
+				// fmt.Println("timeout++")
 			}
 			mx.Unlock()
 		}
@@ -61,7 +61,7 @@ func RunTest() {
 		//清空管道的剩余内容，定时器出现开始
 		for len(TIMEOUT) == 1 {
 			<-TIMEOUT
-			fmt.Println("timeput--")
+			// fmt.Println("timeput--")
 		}
 
 		var ans int
@@ -71,7 +71,7 @@ func RunTest() {
 			fmt.Println("回答正确！")
 		} else if len(TIMEOUT) == 1 {
 			fmt.Printf("%v,正确答案是:%v\n", <-TIMEOUT, l.Answer) //取出管道
-			fmt.Println("timeout--")
+			// fmt.Println("timeout--")
 		} else {
 			fmt.Printf("回答错误，正确答案是:%v\n", l.Answer)
 		}
