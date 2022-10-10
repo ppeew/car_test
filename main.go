@@ -8,8 +8,6 @@ import (
 	"car_test/logic"
 )
 
-var COUNT int = 10                             //题目数量
-var TIMEOUT chan string = make(chan string, 1) //是否超时
 var need_quit bool = false                     //是否退出程序
 
 func main() {
