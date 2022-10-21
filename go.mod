@@ -1,10 +1,10 @@
-module "github.com/ppeew/car_test"
+module github.com/ppeew/car_test
 
 go 1.19
 
 require (
-	gorm.io/driver/mysql v1.3.6
-	gorm.io/gorm v1.23.10
+	gorm.io/driver/mysql v1.4.3
+	gorm.io/gorm v1.24.0
 )
 
 require (
