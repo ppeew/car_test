@@ -1,4 +1,4 @@
-module car_test
+module "github.com/ppeew/car_test"
 
 go 1.19
 
