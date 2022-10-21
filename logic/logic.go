@@ -2,13 +2,14 @@ package logic
 
 import (
 	"bufio"
-	"car_test/model"
 	"fmt"
 	"math/rand"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/ppeew/car_test/model"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

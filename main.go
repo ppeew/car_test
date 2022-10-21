@@ -5,10 +5,10 @@ import (
 	"math/rand"
 	"time"
 
-	"car_test/logic"
+	"github.com/ppeew/car_test/logic"
 )
 
-var need_quit bool = false                     //是否退出程序
+var need_quit bool = false //是否退出程序
 
 func main() {
 
