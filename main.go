@@ -11,7 +11,6 @@ import (
 var need_quit bool = false //是否退出程序
 
 func main() {
-
 	rand.Seed(time.Now().Unix())
 	for {
 		fmt.Printf("--1.开始考试\n--2.插入数据库题型\n(输入其他健可以退出)")

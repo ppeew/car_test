@@ -2,6 +2,7 @@ package logic
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -23,31 +24,35 @@ func init() {
 	d.AutoMigrate(&model.Light{})
 }
 
-var TIMEOUT chan string = make(chan string, 1) //是否超时
-var mx sync.Mutex
-var COUNT int = 10 //题目数量
+func createRoutinue(ctx context.Context, wg *sync.WaitGroup) chan struct{} {
+	timeout := make(chan struct{})
+	go func() {
+		defer close(timeout)
+		defer wg.Done()
+		select {
+		case <-time.After(time.Second * 7):
+			//获得超时信号
+			timeout <- struct{}{}
+		case <-ctx.Done():
+			//获得退出信号
+			return
+		}
+	}()
+	return timeout
+}
 
 func RunTest() {
+	count := 10 //题目数量
+	var wg sync.WaitGroup
 	score := 0
 	tran := [4]string{"近光灯", "远光灯", "远近交替", "示宽灯"}
 	used_que := make(map[int64]bool, 0)
 
-	t := time.NewTicker(5 * time.Second)
-	go func() {
-		for {
-			<-t.C
-			mx.Lock()
-			if len(TIMEOUT) == 0 {
-				TIMEOUT <- "timeout"
-				// fmt.Println("timeout++")
-			}
-			mx.Unlock()
-		}
-	}()
-
-	for i := 0; i < COUNT; i++ {
+	for i := 0; i < count; i++ {
+		//生成题目
 		var ls []model.Light
 		total := d.Raw("SELECT * FROM lights").Scan(&ls).RowsAffected
+		fmt.Printf("total: %v\n", total)
 		r := rand.Int63n(total)
 		for used_que[r] {
 			//使用过了
@@ -57,25 +62,26 @@ func RunTest() {
 		l := ls[r]
 		fmt.Printf("\033[1;31;40mQuestion%v: %v\033[0m\n\033[1;35;48m(0:近光灯--1:远光灯--2:远近交替--3:示宽灯):\033[0m", i+1, l.Question)
 
-		//设置定时器ticker配置
-		t.Reset(5 * time.Second)
-		//清空管道的剩余内容，定时器出现开始
-		for len(TIMEOUT) == 1 {
-			<-TIMEOUT
-			// fmt.Println("timeput--")
-		}
-
+		//每次生成题目调用一个协程，检查超时时间
+		ctx, cancel := context.WithCancel(context.Background())
+		wg.Add(1)
+		timeout := createRoutinue(ctx, &wg)
 		var ans int
 		fmt.Scanln(&ans)
-		if tran[ans] == l.Answer && len(TIMEOUT) == 0 {
-			score += 100 / COUNT
-			fmt.Println("回答正确！")
-		} else if len(TIMEOUT) == 1 {
-			fmt.Printf("%v,正确答案是:%v\n", <-TIMEOUT, l.Answer) //取出管道
-			// fmt.Println("timeout--")
-		} else {
-			fmt.Printf("回答错误，正确答案是:%v\n", l.Answer)
+		select {
+		case <-timeout:
+			fmt.Printf("超时,正确答案是:%v\n", l.Answer)
+		default:
+			if tran[ans] == l.Answer {
+				score += 100 / count
+				fmt.Println("回答正确！")
+			} else {
+				fmt.Printf("回答错误，正确答案是:%v\n", l.Answer)
+			}
 		}
+		//完成事件
+		cancel()
+		wg.Wait()
 	}
 	fmt.Printf("\033[1;31;40m考试结束，你的成绩为:%v分\033[0m\n", score)
 }
